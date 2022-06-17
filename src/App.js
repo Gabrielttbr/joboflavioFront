@@ -4,14 +4,19 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import { Table, Button, Modal, Form } from 'react-bootstrap'
 function App() {
   const [show, setShow] = useState(false);
+  const [showDelete, setShowDelete] = useState(false);
+  const [courses, setCourses] = useState([]);
 
+  /*==============================================================================================*/
+  //                                Métodos de abrir e fechar Modais    
+  /*==============================================================================================*/
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
-  const [showDelete, setShowDelete] = useState(false);
-
   const handleCloseDelete = () => setShowDelete(false);
   const handleShowDelete = () => setShowDelete(true);
-
+  /*==============================================================================================*/
+  //                    Método responsavel por fazer somente uma requição da api                  //
+  /*==============================================================================================*/
   useEffect(() => {
     let requestOptions = {
       method: 'GET',
@@ -19,10 +24,11 @@ function App() {
     };
     
     fetch("http://localhost:4000/course", requestOptions)
-      .then(response => response.text())
-      .then(result => console.log(result))
+      .then(response => response.json())
+      .then(result => setCourses(result.response))
       .catch(error => console.log('error', error));
   }, []);
+  console.log(courses)
   return (
     <main>
       <Table striped bordered hover size="sm">
@@ -34,13 +40,16 @@ function App() {
           </tr>
         </thead>
         <tbody>
-          <tr>
-            <td>1</td>
-            <td>Mark</td>
-            <td>Otto</td>
-            <td><Button variant="primary" onClick={handleShow}>editar</Button>
-              <Button variant="danger" onClick={handleShowDelete}>deletar</Button></td>
-          </tr>
+          {
+          courses.map((item) => (
+            <tr key={item.ID}>
+              <td>{item.ID}</td>
+              <td>{item.DESCRICAO}</td>
+              <td>{item.CARGA_HORARIA}</td>
+              <td><Button variant="primary" onClick={handleShow}>editar</Button>
+                <Button variant="danger" onClick={handleShowDelete}>deletar</Button></td>
+            </tr>
+          ))}
         </tbody>
       </Table>
       <Modal show={show} onHide={handleClose}>
