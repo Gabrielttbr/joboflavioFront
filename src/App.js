@@ -4,17 +4,17 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import { Table, Button, Modal, Form } from 'react-bootstrap'
 function App() {
   const [show, setShow] = useState(false);
-  const [showDelete, setShowDelete] = useState(false);
   const [courses, setCourses] = useState([]);
-  const [idDelete, setIdDelete] = useState()
-
+  const [description, setDescription] = useState();
+  const [workload, setWorloand] = useState();
+  const [idEdit, setIdEdit] = useState();
+  let processDelete = null
   /*==============================================================================================*/
   //                                Métodos de abrir e fechar Modais    
   /*==============================================================================================*/
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
-  const handleCloseDelete = () => setShowDelete(false);
-  const handleShowDelete = () => setShowDelete(true);
+
   /*==============================================================================================*/
   //                    Método responsavel por fazer somente uma requição da api                  //
   /*==============================================================================================*/
@@ -30,13 +30,11 @@ function App() {
       .catch(error => console.log('error', error));
   }, []);
   const EditCourse = (e) => {
-    
-  }
-  const DeleteCourse = (e) => {
     e.preventDefault();
     e.stopPropagation();
     const bodyFront = {
-      id: idDelete
+      id: processDelete
+
     }
     console.log(bodyFront)
     let requestOptions = {
@@ -45,9 +43,29 @@ function App() {
       headers: {"Content-type": "application/json; charset=UTF-8"}
     };
     
-    fetch("http://localhost:4000/course", requestOptions)
-    .then(response => console.log(response.json()))
-    .then(result => console.log(result))
+  }
+  /*==============================================================================================*/
+  //                      Método respónsavel por deletar course 
+  /*==============================================================================================*/
+
+
+  const DeleteCourse =  (e) => {
+
+     e.preventDefault();
+     e.stopPropagation();
+     console.log(processDelete)
+    const bodyFront = {
+      id: processDelete
+    }
+     let requestOptions = {
+      method: 'DELETE',
+      body: JSON.stringify(bodyFront),
+      headers: {"Content-type": "application/json; charset=UTF-8"}
+    };
+    
+     fetch("http://localhost:4000/course", requestOptions)
+    .then(response => alert('Couse delete com sucess',  window.location.reload()))
+   
   }
   return (
     <main>
@@ -72,7 +90,13 @@ function App() {
               <td>{item.DESCRICAO}</td>
               <td>{item.CARGA_HORARIA}</td>
               <td><Button variant="primary" onClick={handleShow}>editar</Button>
-                <Button variant="danger" onClick={handleShowDelete}>deletar</Button></td>
+                  <Button variant="danger"
+                   onClick={(e)=> {
+                      processDelete = item.ID
+                       console.log('Onclick delete antes ' + processDelete)
+                      return DeleteCourse(e)
+                  
+                  }}>deletar</Button></td>
             </tr>
           ))}
         </tbody>
@@ -90,12 +114,12 @@ function App() {
           <Form onSubmit={EditCourse}>
             <Form.Group className="mb-3" controlId="formBasicEmail" required>
               <Form.Label>ID</Form.Label>
-              <Form.Control type="text" placeholder="id please" required/>
+              <Form.Control type="text" placeholder="id please" required onChange={(e) => { setIdEdit(e.target.value)}}/>
               <Form.Label>description</Form.Label>
-              <Form.Control type="text" placeholder="description here" required/>
+              <Form.Control type="text" placeholder="description here" required onChange={(e) => { setDescription(e.target.value)}}/>
               <Form.Label>workload</Form.Label>
 
-              <Form.Control type="text" placeholder="Here workload" required />
+              <Form.Control type="text" placeholder="Here workload" required  onChange={(e) => { setWorloand(e.target.value)}}/>
             </Form.Group>
             <Button variant="primary" type="submit" >
               Submit
@@ -111,36 +135,8 @@ function App() {
           </Button>
         </Modal.Footer>
       </Modal>
-      {
-  /*==============================================================================================*/
-  //                  MODAL DELETAR                                                                //
-  /*==============================================================================================*/
-      }
-      <Modal show={showDelete} onHide={handleCloseDelete}>
-        <Modal.Header closeButton>
-          <Modal.Title>Deletar</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <Form onSubmit={DeleteCourse}>
-            <Form.Group className="mb-3" controlId="formBasicEmail">
-              <Form.Label>ID</Form.Label>
-              <Form.Control type="number" placeholder="id please" required 
-              onChange={(e) => setIdDelete(e.target.value)}/>
-            </Form.Group>
-            <Button variant="primary" type="submit">
-              DELETAR
-            </Button>
-          </Form>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={handleClose}>
-            Close
-          </Button>
-          <Button variant="primary" onClick={handleClose}>
-            Save Changes
-          </Button>
-        </Modal.Footer>
-      </Modal>
+      
+
 
     </main>
 
