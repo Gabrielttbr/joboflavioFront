@@ -6,6 +6,7 @@ function App() {
   const [show, setShow] = useState(false);
   const [showDelete, setShowDelete] = useState(false);
   const [courses, setCourses] = useState([]);
+  const [idDelete, setIdDelete] = useState()
 
   /*==============================================================================================*/
   //                                Métodos de abrir e fechar Modais    
@@ -28,7 +29,26 @@ function App() {
       .then(result => setCourses(result.response))
       .catch(error => console.log('error', error));
   }, []);
-  console.log(courses)
+  const EditCourse = (e) => {
+    
+  }
+  const DeleteCourse = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const bodyFront = {
+      id: idDelete
+    }
+    console.log(bodyFront)
+    let requestOptions = {
+      method: 'DELETE',
+      body: JSON.stringify(bodyFront),
+      headers: {"Content-type": "application/json; charset=UTF-8"}
+    };
+    
+    fetch("http://localhost:4000/course", requestOptions)
+    .then(response => console.log(response.json()))
+    .then(result => console.log(result))
+  }
   return (
     <main>
       <Table striped bordered hover size="sm">
@@ -39,6 +59,11 @@ function App() {
             <th>workload</th>
           </tr>
         </thead>
+        {
+          /*==============================================================================================*/
+          //                    FAZENDO UM MAP DO RESULTADO DOS DADOS DA API                              //
+          /*==============================================================================================*/
+        }
         <tbody>
           {
           courses.map((item) => (
@@ -52,22 +77,27 @@ function App() {
           ))}
         </tbody>
       </Table>
+      {
+  /*==============================================================================================*/
+  //                    MODAL EDITAR                                                               //
+  /*==============================================================================================*/
+      }
       <Modal show={show} onHide={handleClose}>
         <Modal.Header closeButton>
           <Modal.Title>editar</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <Form>
-            <Form.Group className="mb-3" controlId="formBasicEmail">
+          <Form onSubmit={EditCourse}>
+            <Form.Group className="mb-3" controlId="formBasicEmail" required>
               <Form.Label>ID</Form.Label>
-              <Form.Control type="text" placeholder="Enter email" />
+              <Form.Control type="text" placeholder="id please" required/>
               <Form.Label>description</Form.Label>
-              <Form.Control type="text" placeholder="Enter email" />
+              <Form.Control type="text" placeholder="description here" required/>
               <Form.Label>workload</Form.Label>
 
-              <Form.Control type="text" placeholder="Enter email" />
+              <Form.Control type="text" placeholder="Here workload" required />
             </Form.Group>
-            <Button variant="primary" type="submit">
+            <Button variant="primary" type="submit" >
               Submit
             </Button>
           </Form>
@@ -81,15 +111,21 @@ function App() {
           </Button>
         </Modal.Footer>
       </Modal>
+      {
+  /*==============================================================================================*/
+  //                  MODAL DELETAR                                                                //
+  /*==============================================================================================*/
+      }
       <Modal show={showDelete} onHide={handleCloseDelete}>
         <Modal.Header closeButton>
           <Modal.Title>Deletar</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <Form>
+          <Form onSubmit={DeleteCourse}>
             <Form.Group className="mb-3" controlId="formBasicEmail">
               <Form.Label>ID</Form.Label>
-              <Form.Control type="text" placeholder="Enter email" />
+              <Form.Control type="number" placeholder="id please" required 
+              onChange={(e) => setIdDelete(e.target.value)}/>
             </Form.Group>
             <Button variant="primary" type="submit">
               DELETAR
