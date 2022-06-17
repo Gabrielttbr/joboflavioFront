@@ -7,7 +7,9 @@ function App() {
   const [courses, setCourses] = useState([]);
   const [description, setDescription] = useState();
   const [workload, setWorloand] = useState();
-  const [idEdit, setIdEdit] = useState();
+
+
+  let idEdit = null
   let processDelete = null
   /*==============================================================================================*/
   //                                Métodos de abrir e fechar Modais    
@@ -93,7 +95,6 @@ function App() {
                   <Button variant="danger"
                    onClick={(e)=> {
                       processDelete = item.ID
-                       console.log('Onclick delete antes ' + processDelete)
                       return DeleteCourse(e)
                   
                   }}>deletar</Button></td>
@@ -108,13 +109,11 @@ function App() {
       }
       <Modal show={show} onHide={handleClose}>
         <Modal.Header closeButton>
-          <Modal.Title>editar</Modal.Title>
+          <Modal.Title>editar {idEdit}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <Form onSubmit={EditCourse}>
             <Form.Group className="mb-3" controlId="formBasicEmail" required>
-              <Form.Label>ID</Form.Label>
-              <Form.Control type="text" placeholder="id please" required onChange={(e) => { setIdEdit(e.target.value)}}/>
               <Form.Label>description</Form.Label>
               <Form.Control type="text" placeholder="description here" required onChange={(e) => { setDescription(e.target.value)}}/>
               <Form.Label>workload</Form.Label>
