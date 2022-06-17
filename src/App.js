@@ -7,16 +7,19 @@ function App() {
   const [courses, setCourses] = useState([]);
   const [description, setDescription] = useState();
   const [workload, setWorloand] = useState();
+  const [idEdit, setIdEdit] = useState();
 
 
-  let idEdit = null
   let processDelete = null
   /*==============================================================================================*/
   //                                Métodos de abrir e fechar Modais    
   /*==============================================================================================*/
   const handleClose = () => setShow(false);
-  const handleShow = () => setShow(true);
+  const handleShow = (edit) => {
+    setIdEdit(edit)
+    setShow(true);
 
+  }
   /*==============================================================================================*/
   //                    Método responsavel por fazer somente uma requição da api                  //
   /*==============================================================================================*/
@@ -31,43 +34,49 @@ function App() {
       .then(result => setCourses(result.response))
       .catch(error => console.log('error', error));
   }, []);
-  const EditCourse = (e) => {
+  /*==============================================================================================*/
+  //                      Método respónsavel por deletar course 
+  /*==============================================================================================*/
+  
+  
+  const DeleteCourse =  (e) => {
+    
     e.preventDefault();
     e.stopPropagation();
+    console.log(processDelete)
     const bodyFront = {
       id: processDelete
-
     }
-    console.log(bodyFront)
     let requestOptions = {
       method: 'DELETE',
       body: JSON.stringify(bodyFront),
       headers: {"Content-type": "application/json; charset=UTF-8"}
     };
     
+    fetch("http://localhost:4000/course", requestOptions)
+    .then(response => alert('Couse delete com sucess',  window.location.reload()))
+    
   }
-  /*==============================================================================================*/
-  //                      Método respónsavel por deletar course 
-  /*==============================================================================================*/
-
-
-  const DeleteCourse =  (e) => {
-
-     e.preventDefault();
-     e.stopPropagation();
-     console.log(processDelete)
+  const EditCourse = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    console.log(idEdit)
     const bodyFront = {
-      id: processDelete
+      id: idEdit,
+      descricao: description,
+      carga_horaria: workload
+
+
     }
-     let requestOptions = {
-      method: 'DELETE',
+    console.log(bodyFront)
+    let requestOptions = {
+      method: 'PATCH',
       body: JSON.stringify(bodyFront),
       headers: {"Content-type": "application/json; charset=UTF-8"}
     };
+    fetch("http://localhost:4000/course", requestOptions)
+    .then(response => alert('Update to sucess', window.location.reload()))
     
-     fetch("http://localhost:4000/course", requestOptions)
-    .then(response => alert('Couse delete com sucess',  window.location.reload()))
-   
   }
   return (
     <main>
@@ -91,7 +100,10 @@ function App() {
               <td>{item.ID}</td>
               <td>{item.DESCRICAO}</td>
               <td>{item.CARGA_HORARIA}</td>
-              <td><Button variant="primary" onClick={handleShow}>editar</Button>
+              <td><Button variant="primary" onClick={async () => {
+                  const idEdit = item.ID;
+                  return handleShow(idEdit)
+              }}>editar</Button>
                   <Button variant="danger"
                    onClick={(e)=> {
                       processDelete = item.ID
@@ -109,7 +121,7 @@ function App() {
       }
       <Modal show={show} onHide={handleClose}>
         <Modal.Header closeButton>
-          <Modal.Title>editar {idEdit}</Modal.Title>
+          <Modal.Title>{idEdit}  </Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <Form onSubmit={EditCourse}>
@@ -118,7 +130,7 @@ function App() {
               <Form.Control type="text" placeholder="description here" required onChange={(e) => { setDescription(e.target.value)}}/>
               <Form.Label>workload</Form.Label>
 
-              <Form.Control type="text" placeholder="Here workload" required  onChange={(e) => { setWorloand(e.target.value)}}/>
+              <Form.Control type="number" placeholder="Here workload" required  onChange={(e) => { setWorloand(e.target.value)}}/>
             </Form.Group>
             <Button variant="primary" type="submit" >
               Submit
@@ -126,12 +138,10 @@ function App() {
           </Form>
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" onClick={handleClose}>
+          <Button variant="secondary" >
             Close
           </Button>
-          <Button variant="primary" onClick={handleClose}>
-            Save Changes
-          </Button>
+     
         </Modal.Footer>
       </Modal>
       
