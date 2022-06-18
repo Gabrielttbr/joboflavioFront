@@ -4,10 +4,13 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import { Table, Button, Modal, Form } from 'react-bootstrap'
 function App() {
   const [show, setShow] = useState(false);
+  const [showNew, setShowNew] = useState(false);
   const [courses, setCourses] = useState([]);
   const [description, setDescription] = useState();
   const [workload, setWorloand] = useState();
   const [idEdit, setIdEdit] = useState();
+  const [newDescription, setNewDescription] = useState();
+  const [newWorkload, setNewWorkLoad] = useState();
 
 
   let processDelete = null
@@ -20,6 +23,8 @@ function App() {
     setShow(true);
 
   }
+  const handleCloseNew = () => setShowNew(false);
+  const handleShowNew = () => setShowNew(true);
   /*==============================================================================================*/
   //                    Método responsavel por fazer somente uma requição da api                  //
   /*==============================================================================================*/
@@ -60,7 +65,6 @@ function App() {
   const EditCourse = (e) => {
     e.preventDefault();
     e.stopPropagation();
-    console.log(idEdit)
     const bodyFront = {
       id: idEdit,
       descricao: description,
@@ -68,7 +72,6 @@ function App() {
 
 
     }
-    console.log(bodyFront)
     let requestOptions = {
       method: 'PATCH',
       body: JSON.stringify(bodyFront),
@@ -78,8 +81,29 @@ function App() {
     .then(response => alert('Update to sucess', window.location.reload()))
     
   }
+  const NewCourse = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const bodyFront = {
+
+      descricao: newDescription,
+      carga_horaria: newWorkload
+
+
+    }
+    let requestOptions = {
+      method: 'POST',
+      body: JSON.stringify(bodyFront),
+      headers: {"Content-type": "application/json; charset=UTF-8"}
+    };
+    fetch("http://localhost:4000/course", requestOptions)
+    .then(response => alert('create with sucess', window.location.reload()))
+    
+  }
+  
   return (
     <main>
+       <Button variant="primary" onClick={handleShowNew}>New course</Button>
       <Table striped bordered hover size="sm">
         <thead>
           <tr>
@@ -142,6 +166,30 @@ function App() {
             Close
           </Button>
      
+        </Modal.Footer>
+      </Modal>
+      <Modal show={showNew} onHide={handleCloseNew}>
+        <Modal.Header closeButton>
+          <Modal.Title> New course</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Form onSubmit={NewCourse}>
+            <Form.Group className="mb-3" controlId="formBasicEmail" required>
+              <Form.Label>description</Form.Label>
+              <Form.Control type="text" placeholder="description here" required onChange={(e) => { setNewDescription(e.target.value)}}/>
+              <Form.Label>workload</Form.Label>
+
+              <Form.Control type="number" placeholder="Here workload" required  onChange={(e) => { setNewWorkLoad(e.target.value)}}/>
+            </Form.Group>
+            <Button variant="primary" type="submit" >
+              Submit
+            </Button>
+          </Form>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" >
+            Close
+          </Button>
         </Modal.Footer>
       </Modal>
       
